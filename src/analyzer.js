@@ -28,12 +28,13 @@ async function getAllAffectedFiles(filePattern, includeOnly, excludeDirs) {
     reaches: filePattern,
     exclude: excludeDirs.length > 0 ? excludeDirs.join("|") : undefined,
   };
-  const filesToCruise = ["."];
+  const filesToCruise = [".", "tests"];
   try {
     const result = await cruise(filesToCruise, cruiseOptions);
     const textOutput = result.output;
     const files = new Set();
-
+    console.log("textOutput", textOutput);
+    console.log("filePattern", filePattern);
     for (const line of textOutput.split("\n")) {
       if (!line.trim()) continue;
       // Support both unicode and ascii arrows

@@ -9,3 +9,5 @@ dist/
 .env.*.local
 test-endpoints.json
 pest.config.js 
+test-results
+.next

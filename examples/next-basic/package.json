@@ -8,7 +8,8 @@
     "pest:analyze": "pest analyze",
     "pest:merge": "pest merge",
     "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "dev": "next dev"
   },
   "keywords": [],
   "author": "",

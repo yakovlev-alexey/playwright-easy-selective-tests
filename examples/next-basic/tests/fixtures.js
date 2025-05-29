@@ -21,4 +21,5 @@ export const test = base.extend({
     getEndpointFromUrl,
   }),
 });
+
 export const expect = base.expect;

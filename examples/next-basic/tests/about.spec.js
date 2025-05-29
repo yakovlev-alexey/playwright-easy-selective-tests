@@ -1,5 +1,5 @@
 import { test, expect } from "./fixtures.js";
-import { aboutTitle } from "../pages/messages-about.js";
+import { aboutTitle } from "../src/messages-about.js";
 
 test("about page should have about heading", async ({ page }) => {
   await page.goto("/about");
