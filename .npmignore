@@ -1,0 +1,8 @@
+reference/
+.pest-analysis.json
+.pest-temp/
+pest.config.js
+test-endpoints.json
+*.log
+.gitignore
+.git/ 

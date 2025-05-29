@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.pest-analysis.json
+.pest-temp/
+*.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+test-endpoints.json
+pest.config.js 

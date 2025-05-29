@@ -1,0 +1,35 @@
+{
+  "name": "playwright-easy-selective-tests",
+  "version": "0.1.0",
+  "description": "Selective test runner for Playwright based on dependency analysis",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js",
+    "./fixture": "./src/fixture.js"
+  },
+  "bin": {
+    "pest": "./src/cli.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "playwright",
+    "test",
+    "selective",
+    "dependency",
+    "analysis"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0"
+  },
+  "peerDependencies": {
+    "@playwright/test": ">=1.40.0",
+    "dependency-cruiser": ">=15.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
