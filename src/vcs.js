@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
+import { relative, resolve, sep } from "path";
 
 const execAsync = promisify(exec);
 
@@ -75,4 +76,15 @@ export async function wereFilesModified(vcs, baseBranch, files) {
 export async function getChangedFilesMatching(vcs, baseBranch, pattern) {
   const changedFiles = await getChangedFiles(vcs, baseBranch);
   return changedFiles.filter((file) => pattern.test(file));
+}
+
+// Filter and normalize changed files to projectRoot
+export function filterAndNormalizeChangedFiles(changedFiles, projectRoot) {
+  if (!projectRoot) return changedFiles;
+  const absProjectRoot = resolve(process.cwd(), projectRoot);
+  return changedFiles
+    .filter(
+      (f) => f.startsWith(projectRoot + sep) || f.startsWith(projectRoot + "/")
+    )
+    .map((f) => relative(absProjectRoot, resolve(process.cwd(), f)));
 }

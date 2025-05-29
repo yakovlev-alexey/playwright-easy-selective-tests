@@ -11,6 +11,7 @@ import { resolve } from "path";
  * @property {string} endpointRegex - Regex for identifying endpoint modules in dependency cruiser output
  * @property {string} testFilesRegex - Regex for test files
  * @property {string} [testEndpointMapFile='test-endpoints.json'] - Output file for test-case to endpoint sync
+ * @property {string} [projectRoot] - Path (relative to VCS root) to the project/package root
  */
 
 /**
@@ -23,6 +24,7 @@ const defaultConfig = {
   forceAllTestsFiles: [],
   excludeDirectories: [],
   testEndpointMapFile: "test-endpoints.json",
+  projectRoot: undefined,
 };
 
 /**

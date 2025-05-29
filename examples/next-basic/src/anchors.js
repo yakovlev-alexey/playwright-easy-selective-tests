@@ -1,4 +1,7 @@
+import { aboutAnchor } from "./anchors-about";
+import { homeAnchor } from "./anchors-home";
+
 export const anchors = {
-  home: { href: "/", label: "Home" },
-  about: { href: "/about", label: "About" },
+  home: homeAnchor,
+  about: aboutAnchor,
 };

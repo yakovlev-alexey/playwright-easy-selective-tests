@@ -1,6 +1,10 @@
 import { cruise } from "dependency-cruiser";
 import { createFilePattern } from "./config.js";
-import { getChangedFilesMatching, wereFilesModified } from "./vcs.js";
+import {
+  filterAndNormalizeChangedFiles,
+  getChangedFilesMatching,
+  wereFilesModified,
+} from "./vcs.js";
 
 /**
  * @typedef {Object} AnalysisResult
@@ -19,24 +23,26 @@ import { getChangedFilesMatching, wereFilesModified } from "./vcs.js";
 async function getAllAffectedFiles(filePattern, includeOnly, excludeDirs) {
   if (!filePattern) return [];
   const cruiseOptions = {
-    outputType: "dot",
+    outputType: "text",
     includeOnly: includeOnly || undefined,
+    reaches: filePattern,
     exclude: excludeDirs.length > 0 ? excludeDirs.join("|") : undefined,
   };
   const filesToCruise = ["."];
   try {
     const result = await cruise(filesToCruise, cruiseOptions);
-    const dotOutput = result.output;
+    const textOutput = result.output;
     const files = new Set();
-    const fileRegex = /"([^"\s]+)"/g;
-    let match;
-    while ((match = fileRegex.exec(dotOutput)) !== null) {
-      const file = match[1];
-      if (!file.includes("->")) {
-        files.add(file);
-      }
+
+    for (const line of textOutput.split("\n")) {
+      if (!line.trim()) continue;
+      // Support both unicode and ascii arrows
+      const [left, right] = line.split(/\s*(?:→|->)\s*/);
+      if (left) files.add(left.trim());
+      if (right) files.add(right.trim());
     }
-    return Array.from(files);
+
+    return Array.from(files).filter(Boolean);
   } catch (error) {
     console.error("Error running dependency-cruiser:", error.message);
     return [];
@@ -90,17 +96,23 @@ export async function analyzeChanges(config) {
     };
   }
   // Get all changed files
-  const changedFiles = await getChangedFilesMatching(
+  const changedFilesRaw = await getChangedFilesMatching(
     config.vcs,
     config.baseBranch,
     /.*/
   );
+  const changedFiles = filterAndNormalizeChangedFiles(
+    changedFilesRaw,
+    config.projectRoot
+  );
+  console.log("changedFiles", changedFiles);
   const filePattern = createFilePattern(changedFiles);
   const allAffectedFiles = await getAllAffectedFiles(
     filePattern,
     config.includeOnly,
     config.excludeDirectories
   );
+  console.log("allAffectedFiles", allAffectedFiles);
   const { endpoints: modifiedEndpoints, tests: modifiedTestFiles } =
     filterAffectedFiles(allAffectedFiles, changedFiles, config);
   return {
