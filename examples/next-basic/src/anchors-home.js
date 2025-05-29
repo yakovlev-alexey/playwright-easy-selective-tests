@@ -1,1 +1,1 @@
-export const homeAnchor = { href: "/", label: "Home" };
+export const homeAnchor = { href: "/", label: "Homes" };

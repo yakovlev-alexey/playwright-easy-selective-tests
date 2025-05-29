@@ -3,7 +3,7 @@ import { createSelectiveTestFixture } from "playwright-easy-selective-tests/fixt
 
 function getEndpointFromUrl(url) {
   try {
-    const u = new URL(url, "http://localhost");
+    const u = new URL(url, "http://localhost:3000");
     // Next.js serves pages as /about, /, etc. Map to pages/about.js, pages/index.js
     let path = u.pathname;
     if (path === "/") return "pages/index.js";
@@ -15,7 +15,7 @@ function getEndpointFromUrl(url) {
 }
 
 export const test = base.extend({
-  page: createSelectiveTestFixture({
+  selectiveTestFixture: createSelectiveTestFixture({
     analysisFile: ".pest-temp/.pest-analysis.json",
     endpointMapFile: "test-endpoints.json",
     getEndpointFromUrl,

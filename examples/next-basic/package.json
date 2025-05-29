@@ -21,6 +21,8 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
-    "dependency-cruiser": "^16.10.2"
+    "@types/node": "^22.15.24",
+    "dependency-cruiser": "^16.10.2",
+    "playwright-easy-selective-tests": "^0.1.0"
   }
 }

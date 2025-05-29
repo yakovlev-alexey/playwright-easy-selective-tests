@@ -10,6 +10,11 @@
   "bin": {
     "pest": "./src/cli.js"
   },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

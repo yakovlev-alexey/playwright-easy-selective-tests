@@ -5,7 +5,7 @@ export default function Home() {
   return (
     <main>
       <h1>{homeTitle}</h1>
-      <a href={anchors.home.href}>{anchors.home.label}</a>
+      <a href={anchors.about.href}>{anchors.about.label}</a>
     </main>
   );
 }

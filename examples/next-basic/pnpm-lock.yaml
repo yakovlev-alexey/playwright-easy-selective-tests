@@ -19,9 +19,15 @@ devDependencies:
   '@playwright/test':
     specifier: ^1.52.0
     version: 1.52.0
+  '@types/node':
+    specifier: ^22.15.24
+    version: 22.15.24
   dependency-cruiser:
     specifier: ^16.10.2
     version: 16.10.2
+  playwright-easy-selective-tests:
+    specifier: ^0.1.0
+    version: 0.1.0(@playwright/test@1.52.0)(dependency-cruiser@16.10.2)
 
 packages:
 
@@ -128,6 +134,12 @@ packages:
       tslib: 2.8.1
     dev: false
 
+  /@types/node@22.15.24:
+    resolution: {integrity: sha512-w9CZGm9RDjzTh/D+hFwlBJ3ziUaVw7oufKA3vOFSOZlzmW9AkZnfjPb+DLnrV6qtgL/LNmP0/2zBNCFHL3F0ng==}
+    dependencies:
+      undici-types: 6.21.0
+    dev: true
+
   /acorn-jsx-walk@2.0.0:
     resolution: {integrity: sha512-uuo6iJj4D4ygkdzd6jPtcxs8vZgDX9YFIkqczGImoypX2fQ4dVImmu3UzA4ynixCIMTrEOWW+95M2HuBaCEOVA==}
     dev: true
@@ -208,6 +220,11 @@ packages:
 
   /color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+    dev: true
+
+  /commander@11.1.0:
+    resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
+    engines: {node: '>=16'}
     dev: true
 
   /commander@13.1.0:
@@ -425,6 +442,19 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
+  /playwright-easy-selective-tests@0.1.0(@playwright/test@1.52.0)(dependency-cruiser@16.10.2):
+    resolution: {integrity: sha512-73m4d0/GGfaYTHKk4kkzmpP+ksWJrbgGa9bxe5cuOK0PXeNVFcLcm+aj6smKEXxaritYmrmOCCe0ccdCbCU2nA==}
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    peerDependencies:
+      '@playwright/test': '>=1.40.0'
+      dependency-cruiser: '>=15.0.0'
+    dependencies:
+      '@playwright/test': 1.52.0
+      commander: 11.1.0
+      dependency-cruiser: 16.10.2
+    dev: true
+
   /playwright@1.52.0:
     resolution: {integrity: sha512-JAwMNMBlxJ2oD1kce4KPtMkDeKGHQstdpFPcPH3maElAXon/QZeTvtsfXmTMRyO9TslfoYOXkSsvao2nE1ilTw==}
     engines: {node: '>=18'}
@@ -587,6 +617,10 @@ packages:
   /tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
     dev: false
+
+  /undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+    dev: true
 
   /watskeburt@4.2.3:
     resolution: {integrity: sha512-uG9qtQYoHqAsnT711nG5iZc/8M5inSmkGCOp7pFaytKG2aTfIca7p//CjiVzAE4P7hzaYuCozMjNNaLgmhbK5g==}

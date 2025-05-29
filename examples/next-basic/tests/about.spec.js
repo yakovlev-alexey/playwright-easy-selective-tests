@@ -1,4 +1,5 @@
-import { test, expect } from "./fixtures.js";
+import { test, expect } from "./test.js";
+// import { test, expect } from "@playwright/test";
 import { aboutTitle } from "../src/messages-about.js";
 
 test("about page should have about heading", async ({ page }) => {
