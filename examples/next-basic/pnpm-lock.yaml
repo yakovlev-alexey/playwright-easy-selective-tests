@@ -26,8 +26,8 @@ devDependencies:
     specifier: ^16.10.2
     version: 16.10.2
   playwright-easy-selective-tests:
-    specifier: ^0.1.1
-    version: 0.1.1(@playwright/test@1.52.0)(dependency-cruiser@16.10.2)
+    specifier: ^0.1.2
+    version: 0.1.2(@playwright/test@1.52.0)(dependency-cruiser@16.10.2)
 
 packages:
 
@@ -442,8 +442,8 @@ packages:
     engines: {node: '>=18'}
     hasBin: true
 
-  /playwright-easy-selective-tests@0.1.1(@playwright/test@1.52.0)(dependency-cruiser@16.10.2):
-    resolution: {integrity: sha512-syOewi+MuQ5fSynUQyyGCL4+lmeFMwVVkQnrYpuQAWE5CvOdqLC/61HT4vJAY4GQZP7sQxcwUfJ/pQdmxjBQXQ==}
+  /playwright-easy-selective-tests@0.1.2(@playwright/test@1.52.0)(dependency-cruiser@16.10.2):
+    resolution: {integrity: sha512-6MzPIvVNIvgBjk9Ai/D7nqkBzeGGAV/sxc95TmxsYEhL2ugc9w/rXqcyKZmYJBbsp65DM4Fy+3NYzK/H6eEjmA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:

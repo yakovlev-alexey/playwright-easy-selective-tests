@@ -27,10 +27,10 @@ async function getAllAffectedFiles(filePattern, includeOnly, excludeDirs) {
     outputType: "text",
     includeOnly: includeOnly || undefined,
     reaches: filePattern,
-    exclude: excludeDirs.length > 0 ? excludeDirs.join("|") : undefined,
+    exclude: excludeDirs,
   };
 
-  const filesToCruise = [".", "tests"];
+  const filesToCruise = ["."];
 
   try {
     const result = await cruise(filesToCruise, cruiseOptions);
