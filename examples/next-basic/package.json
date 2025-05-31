@@ -23,6 +23,6 @@
     "@playwright/test": "^1.52.0",
     "@types/node": "^22.15.24",
     "dependency-cruiser": "^16.10.2",
-    "playwright-easy-selective-tests": "^0.1.0"
+    "playwright-easy-selective-tests": "^0.1.1"
   }
 }
