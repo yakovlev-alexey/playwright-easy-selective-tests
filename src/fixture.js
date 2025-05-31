@@ -48,8 +48,7 @@ export function createSelectiveTestFixture(options = {}) {
   let endpointMap = {};
   let workerEndpointMap = {};
 
-  return async ({ page }, use, testInfo) => {
-    // Load data on first use
+  const fixture = async ({ page }, use, testInfo) => {
     if (!analysisData) {
       analysisData = await readJsonFile(join(process.cwd(), analysisFile));
       endpointMap = await readJsonFile(join(process.cwd(), endpointMapFile));
@@ -108,53 +107,43 @@ export function createSelectiveTestFixture(options = {}) {
     // Use the page
     await use();
 
-    // Check for endpoint mismatches if getEndpointFromUrl is provided
-    if (shouldRun && getEndpointFromUrl !== options.getEndpointFromUrl) {
-      const trackedList = Array.from(trackedEndpoints);
-      const unexpectedEndpoints = trackedList.filter(
-        (ep) => !expectedEndpoints.includes(ep)
-      );
-      const missingEndpoints = expectedEndpoints.filter(
-        (ep) => !trackedEndpoints.has(ep)
-      );
+    if (!shouldRun) {
+      return;
+    }
 
-      if (unexpectedEndpoints.length > 0 || missingEndpoints.length > 0) {
-        let message = "";
-        if (unexpectedEndpoints.length > 0) {
-          message += `Unexpected endpoints used: ${unexpectedEndpoints.join(
-            ", "
-          )}. `;
-        }
-        if (missingEndpoints.length > 0) {
-          message += `Expected endpoints not used: ${missingEndpoints.join(
-            ", "
-          )}. `;
-        }
-        message += `Update ${endpointMapFile} and run tests again.`;
+    const trackedList = Array.from(trackedEndpoints);
+    const unexpectedEndpoints = trackedList.filter(
+      (ep) => !expectedEndpoints.includes(ep)
+    );
+    const missingEndpoints = expectedEndpoints.filter(
+      (ep) => !trackedEndpoints.has(ep)
+    );
 
-        testInfo.annotations.push({
-          type: "endpoint-mismatch",
-          description: message,
-        });
-
-        // Store mismatch for later
-        workerEndpointMap[testId] = trackedList;
+    if (unexpectedEndpoints.length > 0 || missingEndpoints.length > 0) {
+      let message = "";
+      if (unexpectedEndpoints.length > 0) {
+        message += `Unexpected endpoints used: ${unexpectedEndpoints.join(
+          ", "
+        )}. `;
       }
+      if (missingEndpoints.length > 0) {
+        message += `Expected endpoints not used: ${missingEndpoints.join(
+          ", "
+        )}. `;
+      }
+      message += `Update ${endpointMapFile} and run tests again.`;
+
+      testInfo.annotations.push({
+        type: "endpoint-mismatch",
+        description: message,
+      });
+
+      // Store mismatch for later
+      workerEndpointMap[testId] = trackedList;
     }
   };
-}
 
-/**
- * Creates an afterAll hook to save endpoint data
- * @param {FixtureOptions} options - Fixture options
- * @returns {Function} Playwright afterAll hook
- */
-export function createAfterAllHook(options = {}) {
-  const { tempDir = ".pest-temp" } = options;
-
-  return async ({}, testInfo) => {
-    const workerEndpointMap = testInfo.config.metadata?.workerEndpointMap || {};
-
+  const afterAllHook = async ({}, testInfo) => {
     if (Object.keys(workerEndpointMap).length === 0) {
       return;
     }
@@ -170,10 +159,12 @@ export function createAfterAllHook(options = {}) {
       console.log(
         `Worker ${workerId} saved endpoint data for ${
           Object.keys(workerEndpointMap).length
-        } tests`
+        } tests. Make sure to run 'pest merge' to update the endpoint map.`
       );
     } catch (error) {
       console.warn(`Error writing worker file ${workerId}: ${error}`);
     }
   };
+
+  return [[fixture, { scope: "test", auto: true }], afterAllHook];
 }

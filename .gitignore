@@ -8,6 +8,5 @@ dist/
 .env.local
 .env.*.local
 test-endpoints.json
-pest.config.js 
 test-results
 .next

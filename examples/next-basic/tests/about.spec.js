@@ -1,6 +1,6 @@
 import { test, expect } from "./test.js";
-// import { test, expect } from "@playwright/test";
 import { aboutTitle } from "../src/messages-about.js";
+import { homeTitle } from "../src/messages-home.js";
 
 test("about page should have about heading", async ({ page }) => {
   await page.goto("/about");
@@ -13,4 +13,10 @@ test("about page should have link to home", async ({ page }) => {
     "href",
     "/"
   );
+});
+
+test("link to home should navigate to home page", async ({ page }) => {
+  await page.goto("/about");
+  await page.locator("a", { hasText: "Home" }).click();
+  await expect(page.locator("h1")).toHaveText(homeTitle);
 });

@@ -22,19 +22,21 @@ import {
  */
 async function getAllAffectedFiles(filePattern, includeOnly, excludeDirs) {
   if (!filePattern) return [];
+
   const cruiseOptions = {
     outputType: "text",
     includeOnly: includeOnly || undefined,
     reaches: filePattern,
     exclude: excludeDirs.length > 0 ? excludeDirs.join("|") : undefined,
   };
+
   const filesToCruise = [".", "tests"];
+
   try {
     const result = await cruise(filesToCruise, cruiseOptions);
     const textOutput = result.output;
     const files = new Set();
-    console.log("textOutput", textOutput);
-    console.log("filePattern", filePattern);
+
     for (const line of textOutput.split("\n")) {
       if (!line.trim()) continue;
       // Support both unicode and ascii arrows
@@ -62,6 +64,7 @@ function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
   const testRegex = new RegExp(config.testFilesRegex);
   const endpoints = allAffectedFiles.filter((file) => endpointRegex.test(file));
   const tests = allAffectedFiles.filter((file) => testRegex.test(file));
+
   // Also check if changed files themselves are endpoints or tests
   changedFiles.forEach((file) => {
     if (endpointRegex.test(file) && !endpoints.includes(file)) {
@@ -71,6 +74,7 @@ function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
       tests.push(file);
     }
   });
+
   return {
     endpoints: [...new Set(endpoints)],
     tests: [...new Set(tests)],
@@ -89,6 +93,7 @@ export async function analyzeChanges(config) {
     config.baseBranch,
     config.forceAllTestsFiles
   );
+
   if (forceAll) {
     return {
       runAllTests: true,
@@ -96,26 +101,29 @@ export async function analyzeChanges(config) {
       modifiedTestFiles: [],
     };
   }
-  // Get all changed files
+
   const changedFilesRaw = await getChangedFilesMatching(
     config.vcs,
     config.baseBranch,
     /.*/
   );
+
   const changedFiles = filterAndNormalizeChangedFiles(
     changedFilesRaw,
     config.projectRoot
   );
-  console.log("changedFiles", changedFiles);
+
   const filePattern = createFilePattern(changedFiles);
+
   const allAffectedFiles = await getAllAffectedFiles(
     filePattern,
     config.includeOnly,
     config.excludeDirectories
   );
-  console.log("allAffectedFiles", allAffectedFiles);
+
   const { endpoints: modifiedEndpoints, tests: modifiedTestFiles } =
     filterAffectedFiles(allAffectedFiles, changedFiles, config);
+
   return {
     runAllTests: false,
     modifiedEndpoints,

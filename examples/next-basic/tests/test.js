@@ -14,12 +14,16 @@ function getEndpointFromUrl(url) {
   }
 }
 
-export const test = base.extend({
-  selectiveTestFixture: createSelectiveTestFixture({
-    analysisFile: ".pest-temp/.pest-analysis.json",
-    endpointMapFile: "test-endpoints.json",
-    getEndpointFromUrl,
-  }),
+const [selectiveTestFixture, afterAllHook] = createSelectiveTestFixture({
+  analysisFile: ".pest-temp/.pest-analysis.json",
+  endpointMapFile: "test-endpoints.json",
+  getEndpointFromUrl,
 });
+
+export const test = base.extend({
+  selectiveTestFixture: selectiveTestFixture,
+});
+
+test.afterAll(afterAllHook);
 
 export const expect = base.expect;

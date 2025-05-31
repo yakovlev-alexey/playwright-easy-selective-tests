@@ -42,22 +42,17 @@ program
         timestamp: new Date().toISOString(),
       };
 
-      // Create output directory if needed
       const outputPath = resolve(process.cwd(), options.output);
       await mkdir(dirname(outputPath), { recursive: true });
 
-      // Write analysis results
       await writeFile(outputPath, JSON.stringify(outputData, null, 2));
 
       console.log("\nAnalysis complete:");
       console.log(`- Run all tests: ${analysis.runAllTests}`);
-      console.log(`- Modified endpoints: ${analysis.modifiedEndpoints.length}`);
-      console.log(
-        `- Modified test files: ${analysis.modifiedTestFiles.length}`
-      );
+      console.log(`- Affected endpoints: ${analysis.modifiedEndpoints}`);
+      console.log(`- Affected test files: ${analysis.modifiedTestFiles}`);
       console.log(`\nResults saved to: ${outputPath}`);
 
-      // Exit with code 0 (success)
       process.exit(0);
     } catch (error) {
       console.error("Error:", error.message);
@@ -147,8 +142,19 @@ export default {
       console.log("Created pest.config.js");
       console.log("\nNext steps:");
       console.log("1. Edit pest.config.js to match your project structure");
-      console.log('2. Run "pest analyze" to analyze changes');
-      console.log("3. Use the fixture in your Playwright tests");
+      console.log("2. Use the fixture in your Playwright tests");
+      console.log(
+        "3. Do a raw run to generate initial test to endpoint mapping"
+      );
+      console.log(
+        "3. Run 'pest merge' to merge the initial test to endpoint mapping"
+      );
+      console.log("When making changes:");
+      console.log('1. Run "pest analyze" to analyze changes');
+      console.log("2. Run Playwright tests. Unaffected ones will be skipped");
+      console.log(
+        '3. Run "pest merge" to update the test to endpoint mapping if necessary'
+      );
     } catch (error) {
       console.error("Error creating config file:", error.message);
       process.exit(1);

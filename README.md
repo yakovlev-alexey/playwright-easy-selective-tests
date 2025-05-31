@@ -1,6 +1,6 @@
 # Playwright Easy Selective Tests (PEST)
 
-A powerful tool for running only the Playwright tests affected by your code changes. PEST analyzes your code dependencies to determine which tests need to run, significantly reducing CI/CD time.
+A powerful tool for running only the Playwright tests affected by your code changes. PEST analyzes your code dependencies to determine which tests need to run, significantly reducing CI/CD time. Need very little configuration to run and shows great results!
 
 ## Features
 
@@ -13,11 +13,21 @@ A powerful tool for running only the Playwright tests affected by your code chan
 ## Installation
 
 ```bash
-npm install --save-dev playwright-easy-selective-tests
-# or
 pnpm add -D playwright-easy-selective-tests
 # or
+npm install --save-dev playwright-easy-selective-tests
+# or
 yarn add -D playwright-easy-selective-tests
+```
+
+Do not forget to install peer dependencies:
+
+```bash
+pnpm add -D dependency-cruiser
+# or
+npm install --save-dev dependency-cruiser
+# or
+yarn add -D dependency-cruiser
 ```
 
 ## Quick Start
@@ -25,226 +35,192 @@ yarn add -D playwright-easy-selective-tests
 ### 1. Initialize Configuration
 
 ```bash
-npx pest init
+pnpm pest init
 ```
 
 This creates a `pest.config.js` file. Edit it to match your project:
 
-```javascript
+```js
 // pest.config.js
 export default {
-  // Version control system command
-  vcs: "git", // or 'arc' for Phabricator
-
-  // Branch to compare against
+  vcs: "git",
   baseBranch: "main",
-
-  // Files that trigger all tests when changed
   forceAllTestsFiles: [
     "playwright.config.js",
     ".github/workflows/*.yml",
     "src/shared/config.js",
   ],
-
-  // Directories to exclude from analysis
   excludeDirectories: ["node_modules", "dist", ".git"],
-
-  // Pattern for your app's entry points (pages, bundles, etc.)
-  endpointRegex: "^src/pages/.*\\.tsx?$",
-
-  // Pattern for test files
+  endpointRegex: "^pages/.*\\.tsx?$",
   testFilesRegex: "^tests/.*\\.spec\\.ts$",
-
-  // File to store test-endpoint mappings
-  testEndpointMapFile: "test-endpoints.json",
+  testEndpointMapFile: "tests/test-endpoints.json",
+  projectRoot: undefined,
 };
 ```
 
-### 2. Add Analysis to Your CI Pipeline
+### 2. Undestrand how your endpoints work
 
-Add a step before running tests:
+The only challenging bit of configuration you need to do is to help PEST match files and urls to endpoints. Endpoint is not necessarily a URL endpoint, but rather a single somewhat decoupled part of your application. For some projects endpoints might be represented by pages (for example, Next.js), other projects can have custom solutions, including monolithic setups with multiple applications in the same project - in this case endpoints may represent those applications. When you are settled with how this should work:
 
-```yaml
-# .github/workflows/test.yml
-- name: Analyze changes
-  run: npx pest analyze
+1. Update `endpointRegex` in `pest.config.js`. It should only match paths to your endpoints. For example, `^pages/.*\\.jsx?$` will match all page files in Next.js project and results will loke like `pages/about/contacts.js`.
 
-- name: Run affected tests
-  run: npx playwright test
-```
+   > Some projects can have chaotic folder structure. In this case some refactoring might be necessary.
 
-### 3. Configure Playwright Tests
+2. Create `getEndpointFromUrl(url)` function. It will be used in fixture in the next step
 
-Update your Playwright configuration to use the selective test fixture:
+   This function is necessary to match URLs that are being visited when running the test to endpoints. Endpoint format should match the regex results (be a path to endpoint file).
 
-```javascript
-// playwright.config.js
-import { defineConfig } from "@playwright/test";
+   ```js
+   function getEndpointFromUrl(url) {
+     try {
+       const u = new URL(url, "http://localhost");
+       // Example: Next.js serves pages as /about, /, etc. Map to pages/about.js, pages/index.js
+       let path = u.pathname;
+       if (path === "/") return "pages/index.js";
+       if (path.endsWith("/")) path = path.slice(0, -1);
+       return `pages${path}.js`;
+     } catch {
+       return null;
+     }
+   }
+   ```
 
-export default defineConfig({
-  // your existing config...
-});
-```
+### 3. Configure Playwright Tests with the Selective Fixture
 
-Create a custom test fixture:
+Add fixture to your extended `test`:
 
-```javascript
-// tests/fixtures.js
+```js
+// tests/test.js
 import { test as base } from "@playwright/test";
-import {
-  createSelectiveTestFixture,
-  createAfterAllHook,
-} from "playwright-easy-selective-tests/fixture";
+import { createSelectiveTestFixture } from "playwright-easy-selective-tests/fixture";
+
+function getEndpointFromUrl(url) {
+  try {
+    const u = new URL(url, "http://localhost:3000");
+    // Example: Next.js serves pages as /about, /, etc. Map to pages/about.js, pages/index.js
+    let path = u.pathname;
+    if (path === "/") return "pages/index.js";
+    if (path.endsWith("/")) path = path.slice(0, -1);
+    return `pages${path}.js`;
+  } catch {
+    return null;
+  }
+}
+
+const [selectiveTestFixture, afterAllHook] = createSelectiveTestFixture({
+  analysisFile: ".pest-temp/.pest-analysis.json", // Path to analysis results file from `pest analyze`
+  endpointMapFile: "tests/test-endpoints.json", // Path to test-endpoint map file
+  tempDir: ".pest-temp", // Temporary directory for worker files
+  getEndpointFromUrl, // Function to extract endpoint from URL
+});
 
 export const test = base.extend({
-  page: createSelectiveTestFixture({
-    analysisFile: ".pest-analysis.json",
-    endpointMapFile: "test-endpoints.json",
-    endpointRegex: "^/pages/.*", // URL pattern for your pages
-  }),
+  selectiveTestFixture: selectiveTestFixture,
 });
 
-// Add afterAll hook to save endpoint data
-test.afterAll(createAfterAllHook());
+// Make sure to also include the hook!
+test.afterAll(afterAllHook);
 
-export { expect } from "@playwright/test";
+export const expect = base.expect;
 ```
 
-### 4. Use in Your Tests
+> It's best to put the fixture as early as possible - otherwise it might take more time to skip a test due to other fixtures.
 
-```javascript
-// tests/example.spec.ts
-import { test, expect } from "./fixtures";
-
-test("user can login", async ({ page }) => {
-  await page.goto("/pages/login");
-  // Your test code...
-});
-
-test("user can view profile", async ({ page }) => {
-  await page.goto("/pages/profile");
-  // Your test code...
-});
-```
+### 4. Simply run your tests
 
 ### 5. Merge Endpoint Mappings
 
 After running tests, merge the endpoint mappings:
 
 ```bash
-npx pest merge
+pnpm pest merge
 ```
 
 This command collects endpoint usage data from all test workers and updates your `test-endpoints.json` file.
 
+### 6. Analyze changes before running tests
+
+After making changes make sure to run analysis command:
+
+```bash
+pnpm pest analyze
+```
+
+This command will generate a temporary file with the list of changed endpoints. This file be later consumed by fixture to tell which tests need to run.
+
 ## How It Works
 
 1. **Analysis Phase**: PEST analyzes your code changes using the VCS (git by default) and dependency-cruiser to find:
-
    - Which source files changed
    - Which endpoints/pages are affected by these changes
    - Which test files depend on the changed code
-
 2. **Test Execution**: The Playwright fixture:
-
    - Reads the analysis results
    - Skips tests that don't use any modified endpoints
    - Tracks which endpoints each test actually uses
-   - Reports mismatches to keep the endpoint map up to date
-
+   - Reports mismatches to keep the endpoint map up to date (see testInfo annotations)
 3. **Endpoint Mapping**: After tests run, worker processes save endpoint usage data which can be merged to maintain an accurate map of which tests use which endpoints.
 
 ## Advanced Usage
 
-### Custom VCS Commands
+### Monorepo Setup
 
-For non-git version control systems:
+You can provide a custom `projectRoot` function so that PEST works within monorepos. `projectRoot` should include the path from VCS repository root. Only the changes from this path will be taken into account and this path will be omitted from results.
 
-```javascript
-// pest.config.js
-export default {
-  vcs: "arc", // Uses 'arc diff' instead of 'git diff'
-  baseBranch: "trunk",
-  // ...
-};
+### CI configuration
+
+To use PEST in CI simply run `pnpm pest analyze` before running tests.
+
+```yaml
+# .github/workflows/test.yml
+name: Analyze changes
+run: pnpm pest analyze
+
+name: Run affected tests
+run: pnpm playwright test
 ```
 
-### Multiple Entry Point Types
-
-```javascript
-// pest.config.js
-export default {
-  // Match multiple patterns
-  endpointRegex: "^(src/pages/.*\\.tsx?|src/bundles/.*\\.js)$",
-  // ...
-};
-```
+> You might want to also upload directory with temporary files (`.pest-temp` by default) so that you can use remote run results to update endpoint mapping without running tests locally.
 
 ### Programmatic API
 
-```javascript
-import { loadConfig, analyzeChanges } from "playwright-easy-selective-tests";
+Programmatic API can be used, for example, to check how many shards you need to use in your CI flows. Also if you are using shards, this can be helpful to merge endpoint mappings from multiple shards from remotely executed tests.
+
+```js
+import {
+  loadConfig,
+  analyzeChanges,
+  mergeEndpointMappings,
+} from "playwright-easy-selective-tests";
 
 async function runAnalysis() {
   const config = await loadConfig("./pest.config.js");
   const results = await analyzeChanges(config);
-
   console.log("Run all tests?", results.runAllTests);
-  console.log("Modified endpoints:", results.modifiedEndpoints);
-  console.log("Modified test files:", results.modifiedTestFiles);
+  console.log("Affected endpoints:", results.modifiedEndpoints);
+  console.log("Affected test files:", results.modifiedTestFiles);
 }
+
+// Merge endpoint mappings programmatically
+await mergeEndpointMappings(".pest-temp", "test-endpoints.json");
 ```
 
-### Environment Variables
+## Exports
 
-The analysis results are also exposed as environment variables:
+- `createSelectiveTestFixture` — Main Playwright fixture factory
+- `createAfterAllHook` — AfterAll hook for merging endpoint data
+- `mergeEndpointMappings` — Programmatic endpoint merging
+- `loadConfig`, `analyzeChanges` — Programmatic analysis
 
-- `RUN_ALL_TESTS` - "1" if all tests should run, "0" otherwise
-- `MODIFIED_BUNDLES` - Pipe-separated list of modified endpoints
-- `MODIFIED_TEST_FILES` - Pipe-separated list of modified test files
+## Example Project
 
-## Configuration Reference
+See [`examples/next-basic`](./examples/next-basic) for a full working setup with Playwright and Next.js.
 
-| Option                | Type     | Default                 | Description                             |
-| --------------------- | -------- | ----------------------- | --------------------------------------- |
-| `vcs`                 | string   | `'git'`                 | Version control command                 |
-| `baseBranch`          | string   | `'main'`                | Branch to diff against                  |
-| `forceAllTestsFiles`  | string[] | `[]`                    | Additional files that trigger all tests |
-| `excludeDirectories`  | string[] | `[]`                    | Directories to exclude from analysis    |
-| `endpointRegex`       | string   | required                | Pattern for endpoint files              |
-| `testFilesRegex`      | string   | required                | Pattern for test files                  |
-| `testEndpointMapFile` | string   | `'test-endpoints.json'` | Endpoint mapping file                   |
+## Requirements
 
-## CLI Commands
-
-### `pest analyze`
-
-Analyzes code changes and generates test execution data.
-
-Options:
-
-- `-c, --config <path>` - Path to config file (default: `pest.config.js`)
-- `-o, --output <path>` - Output file path (default: `.pest-analysis.json`)
-
-### `pest merge`
-
-Merges test endpoint mappings from worker files.
-
-Options:
-
-- `-d, --temp-dir <path>` - Temporary directory (default: `.pest-temp`)
-- `-o, --output <path>` - Output file (default: `test-endpoints.json`)
-
-### `pest init`
-
-Creates a starter configuration file.
-
-## Tips
-
-1. **Initial Setup**: Run all tests once to generate the initial endpoint mappings
-2. **CI Integration**: The analyze command exits with code 0 when all tests should run
-3. **Debugging**: Check `.pest-analysis.json` to see what PEST detected
-4. **Performance**: Exclude large directories and node_modules for faster analysis
+- Node.js >= 18
+- Playwright >= 1.40.0
+- dependency-cruiser >= 15.0.0
 
 ## License
 

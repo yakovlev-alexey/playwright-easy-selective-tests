@@ -1,5 +1,4 @@
 import { test, expect } from "./test.js";
-// import { test, expect } from "@playwright/test";
 import { homeTitle } from "../src/messages-home.js";
 
 test("home page should have welcome heading", async ({ page }) => {
