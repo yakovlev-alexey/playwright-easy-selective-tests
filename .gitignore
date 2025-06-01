@@ -7,6 +7,4 @@ dist/
 .env
 .env.local
 .env.*.local
-test-endpoints.json
-test-results
 .next

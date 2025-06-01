@@ -1,11 +1,10 @@
 {
   "name": "playwright-easy-selective-tests",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "Selective test runner for Playwright based on dependency analysis",
   "type": "module",
   "exports": {
-    ".": "./src/index.js",
-    "./fixture": "./src/fixture.js"
+    ".": "./src/index.js"
   },
   "bin": {
     "pest": "./src/cli.js"
@@ -16,7 +15,7 @@
     "README.md"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "vitest run"
   },
   "keywords": [
     "playwright",
@@ -36,5 +35,10 @@
   },
   "engines": {
     "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.3.0",
+    "tmp-promise": "^3.0.3",
+    "vitest": "^3.1.4"
   }
 }

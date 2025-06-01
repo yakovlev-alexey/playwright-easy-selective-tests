@@ -9,5 +9,7 @@ export default {
   endpointRegex: "^pages/.*\\.js$",
   testFilesRegex: "^tests/.*\\.spec\\.js$",
   testEndpointMapFile: "tests/test-endpoints.json",
-  projectRoot: "examples/next-basic",
+  projectRoot: import.meta.url.includes("playwright-easy-selective-tests")
+    ? "examples/next-basic"
+    : undefined,
 };

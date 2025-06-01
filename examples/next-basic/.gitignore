@@ -5,3 +5,11 @@ node_modules/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+test-results
+test-results.json
+
+.pest-analysis.json
+.pest-temp/
+
+.next

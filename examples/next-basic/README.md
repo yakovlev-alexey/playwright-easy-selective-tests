@@ -6,7 +6,7 @@ This is a minimal Next.js project demonstrating selective Playwright test execut
 
 ```bash
 pnpm install
-npx playwright install
+pnpm playwright install
 ```
 
 ## Usage
@@ -14,19 +14,19 @@ npx playwright install
 1. **Analyze changes**
 
    ```bash
-   npx pest analyze
+   pnpm pest analyze
    ```
 
 2. **Run Playwright tests**
 
    ```bash
-   npx playwright test
+   pnpm playwright test
    ```
 
 3. **Merge endpoint mappings** (after running tests)
 
    ```bash
-   npx pest merge
+   pnpm pest merge
    ```
 
 ## How it works

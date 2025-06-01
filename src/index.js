@@ -1,6 +1,6 @@
 export { loadConfig } from "./config.js";
 export { analyzeChanges } from "./analyzer.js";
-export { createSelectiveTestFixture, createAfterAllHook } from "./fixture.js";
+export { createSelectiveTestFixture } from "./fixture.js";
 export {
   readJsonFile,
   getTestId,

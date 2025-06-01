@@ -133,6 +133,7 @@ export function createSelectiveTestFixture(options = {}) {
       }
       message += `Update ${endpointMapFile} and run tests again.`;
 
+      testInfo.status = "failed";
       testInfo.annotations.push({
         type: "endpoint-mismatch",
         description: message,

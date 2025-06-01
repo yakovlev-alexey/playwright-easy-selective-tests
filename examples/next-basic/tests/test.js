@@ -1,5 +1,5 @@
 import { test as base } from "@playwright/test";
-import { createSelectiveTestFixture } from "playwright-easy-selective-tests/fixture";
+import { createSelectiveTestFixture } from "playwright-easy-selective-tests";
 
 function getEndpointFromUrl(url) {
   try {

@@ -1,0 +1,10 @@
+{
+  "about.spec.js::about page should have about heading": ["pages/about.js"],
+  "about.spec.js::about page should have link to home": ["pages/about.js"],
+  "about.spec.js::link to home should navigate to home page": [
+    "pages/about.js",
+    "pages/index.js"
+  ],
+  "index.spec.js::home page should have welcome heading": ["pages/index.js"],
+  "index.spec.js::home page should have link to about": ["pages/index.js"]
+}
