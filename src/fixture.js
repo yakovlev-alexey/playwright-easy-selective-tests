@@ -29,7 +29,7 @@ import {
 export function createSelectiveTestFixture(options = {}) {
   const {
     analysisFile = ".pest-analysis.json",
-    testEndpointMapFile = "test-endpoints.json",
+    testEndpointMapFile = "tests/test-endpoints.json",
     tempDir = ".pest-temp",
     getEndpointFromUrl = () => null,
   } = options;

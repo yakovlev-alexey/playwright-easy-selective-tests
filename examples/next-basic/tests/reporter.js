@@ -1,4 +1,5 @@
 import fs from "fs/promises";
+import { basename } from "path";
 
 /**
  * @typedef {import('@playwright/test').FullConfig} FullConfig
@@ -38,8 +39,11 @@ class JsonReporter {
    * @param {TestResult} result
    */
   onTestEnd(test, result) {
+    const fileName = basename(test.location.file);
+    const title = `${fileName}::${test.title}`;
+
     this.results.tests.push({
-      title: test.title,
+      title,
       file: test.location.file,
       status: result.status,
     });

@@ -61,13 +61,26 @@ const DEFAULT_PEST_CONFIG = {
   analysisFile: ".pest-temp/.pest-analysis.json",
 };
 
+const getEndpointFromUrl = `(url) => {
+    try {
+      const u = new URL(url, "http://localhost:3000");
+      // Next.js serves pages as /about, /, etc. Map to pages/about.js, pages/index.js
+      let path = u.pathname;
+      if (path === "/") return "pages/index.js";
+      if (path.endsWith("/")) path = path.slice(0, -1);
+      return \`pages\${path}.js\`;
+    } catch {
+      return null;
+    }
+  }`;
+
 export async function updatePestConfiguration(cwd, config) {
   const finalConfig = { ...DEFAULT_PEST_CONFIG, ...config };
   const file = path.join(cwd, "pest.config.js");
-  await fs.writeFile(
-    file,
-    `export default ${JSON.stringify(finalConfig, null, 2)};`
-  );
+  const json = JSON.stringify(finalConfig, null, 2);
+  const fullConfig =
+    json.slice(0, -1) + `,getEndpointFromUrl:${getEndpointFromUrl}` + "}";
+  await fs.writeFile(file, `export default ${fullConfig};`);
 }
 
 export async function mockPestAnalysis(
@@ -93,7 +106,9 @@ export async function updateTestEndpoints(
   newEndpoints,
   file = "tests/test-endpoints.json"
 ) {
-  const baseContent = await readJSON(cwd, file).catch(() => ({}));
+  const baseContent = await readJSON(cwd, "tests/test-endpoints.json").catch(
+    () => ({})
+  );
   const updatedContent = { ...baseContent, ...newEndpoints };
   await fs.writeJSON(path.join(cwd, file), updatedContent);
 }

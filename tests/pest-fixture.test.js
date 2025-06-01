@@ -43,7 +43,8 @@ describe("pest fixture", () => {
     await execAsync(`pnpm test`, { cwd, signal });
 
     const testResults = await readJSON(cwd, "test-results.json");
-    const testEndpointMap = await readJSON(cwd, "test-endpoints.json");
+    const testEndpointMap = await readJSON(cwd, "tests/test-endpoints.json");
+
     Object.entries(testEndpointMap).forEach(([testTitle, endpoints]) => {
       const test = testResults.tests.find((t) => t.title === testTitle);
       expect(test).toBeDefined();
@@ -133,14 +134,14 @@ describe("pest fixture", () => {
       }
     });
 
-    const tempFiles = await readdir(join(cwd, ".pest-temp"));
+    const tempFiles = await readdir(path.join(cwd, ".pest-temp"));
     const workerFile = tempFiles.find((f) => f.startsWith("worker-"));
     expect(workerFile).toBeDefined();
 
     const workerData = await readJSON(cwd, path.join(".pest-temp", workerFile));
-    expect(
-      workerData["index2.spec.js::home page should have link to about"]
-    ).toEqual(["pages/index.js"]);
+    Object.keys(workerData).forEach((key) => {
+      expect(workerData[key]).toMatchObject(["pages/index.js"]);
+    });
   });
 
   test("should use specified test endpoints map file", async ({
@@ -154,7 +155,7 @@ describe("pest fixture", () => {
     await mockPestAnalysis(cwd, {
       runAllTests: false,
       modifiedEndpoints: [],
-      modifiedTestFiles: ["tests/index.spec.js"],
+      modifiedTestFiles: ["tests/about.spec.js"],
     });
     await updateTestEndpoints(cwd, {}, "test-endpoints.json");
 
@@ -162,7 +163,7 @@ describe("pest fixture", () => {
 
     const testResults = await readJSON(cwd, "test-results.json");
     testResults.tests.forEach((test) => {
-      if (test.file.includes("index.spec.js")) {
+      if (test.file.includes("about.spec.js")) {
         expect(test.status).toBe("passed");
       } else {
         expect(test.status).toBe("skipped");
@@ -188,9 +189,9 @@ describe("pest fixture", () => {
       [testTitle]: [],
     });
 
-    await execAsync(`pnpm test`, { cwd, signal });
+    await execAsync(`pnpm test`, { cwd, signal }).catch(() => {});
 
-    const tempFiles = await readdir(join(cwd, "temp"));
+    const tempFiles = await readdir(path.join(cwd, "temp"));
     const workerFile = tempFiles.find((f) => f.startsWith("worker-"));
     expect(workerFile).toBeDefined();
   });

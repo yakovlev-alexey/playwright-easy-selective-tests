@@ -113,8 +113,6 @@ export async function analyzeChanges(config) {
     config.projectRoot
   );
 
-  console.log("changedFiles", changedFiles);
-
   const filePattern = createFilePattern(changedFiles);
 
   const allAffectedFiles = await getAllAffectedFiles(
