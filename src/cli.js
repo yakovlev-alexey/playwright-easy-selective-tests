@@ -7,9 +7,6 @@ import { loadConfig } from "./config.js";
 import { analyzeChanges } from "./analyzer.js";
 import { mergeEndpointMappings } from "./merge-endpoints.js";
 
-const DEFAULT_TEMP_DIR = ".pest-temp";
-const DEFAULT_ANALYSIS_FILE = `${DEFAULT_TEMP_DIR}/.pest-analysis.json`;
-
 program
   .name("pest")
   .description(
@@ -21,11 +18,6 @@ program
   .command("analyze")
   .description("Analyze changes and prepare test execution data")
   .option("-c, --config <path>", "Path to configuration file", "pest.config.js")
-  .option(
-    "-o, --output <path>",
-    "Output file for analysis results",
-    DEFAULT_ANALYSIS_FILE
-  )
   .action(async (options) => {
     try {
       console.log("Loading configuration...");
@@ -42,7 +34,7 @@ program
         timestamp: new Date().toISOString(),
       };
 
-      const outputPath = resolve(process.cwd(), options.output);
+      const outputPath = resolve(process.cwd(), config.analysisFile);
       await mkdir(dirname(outputPath), { recursive: true });
 
       await writeFile(outputPath, JSON.stringify(outputData, null, 2));
@@ -63,20 +55,13 @@ program
 program
   .command("merge")
   .description("Merge test endpoint mappings from worker files")
-  .option(
-    "-d, --temp-dir <path>",
-    "Temporary directory with worker files",
-    ".pest-temp"
-  )
-  .option(
-    "-o, --output <path>",
-    "Output file for merged mappings",
-    "test-endpoints.json"
-  )
+  .option("-c, --config <path>", "Path to configuration file", "pest.config.js")
   .action(async (options) => {
     try {
-      const tempDir = resolve(process.cwd(), options.tempDir);
-      const outputFile = resolve(process.cwd(), options.output);
+      console.log("Loading configuration...");
+      const config = await loadConfig(options.config);
+      const tempDir = resolve(process.cwd(), config.tempDir);
+      const outputFile = resolve(process.cwd(), config.testEndpointMapFile);
 
       console.log("Merging endpoint mappings...");
       await mergeEndpointMappings(tempDir, outputFile);
@@ -119,19 +104,25 @@ export default {
   ],
   
   // Include only specific files in dependency analysis (optional)
-  // Example: '^(src|tests)/.*\\.(ts|tsx|js|jsx)$'
+  // Example: '^(src|tests)/.*\.(ts|tsx|js|jsx)$'
   includeOnly: undefined,
   
   // Regex to identify endpoint modules in dependency output
   // REQUIRED - must be configured for your project
-  endpointRegex: '^src/pages/.*\\.tsx?$',
+  endpointRegex: '^src/pages/.*\.tsx?$',
   
   // Regex for test files
   // REQUIRED - must be configured for your project
-  testFilesRegex: '^tests/.*\\.spec\\.ts$',
+  testFilesRegex: '^tests/.*\.spec\.ts$',
   
   // Output file for test-endpoint mapping
-  testEndpointMapFile: 'test-endpoints.json'
+  testEndpointMapFile: 'test-endpoints.json',
+
+  // Temporary directory for worker endpoint mapping files
+  tempDir: '.pest-temp',
+
+  // Output file for analysis results
+  analysisFile: '.pest-temp/.pest-analysis.json'
 };
 `;
 

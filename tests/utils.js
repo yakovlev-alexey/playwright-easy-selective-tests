@@ -3,6 +3,7 @@ import fs from "fs-extra";
 import path from "node:path";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
+import { dirname } from "node:path";
 
 export const execAsync = promisify(exec);
 
@@ -36,6 +37,12 @@ export async function appendFile(cwd, file, content) {
   await execAsync(`git add ${file}`, { cwd });
 }
 
+export async function writeFile(cwd, file, content) {
+  const filePath = path.join(cwd, file);
+  await fs.writeFile(filePath, content);
+  await execAsync(`git add ${file}`, { cwd });
+}
+
 export async function readJSON(cwd, ...paths) {
   const file = path.join(cwd, ...paths);
   return fs.readJSON(file);
@@ -50,6 +57,8 @@ const DEFAULT_PEST_CONFIG = {
   testFilesRegex: "^tests/.*\\.spec\\.js$",
   testEndpointMapFile: "tests/test-endpoints.json",
   projectRoot: undefined,
+  tempDir: ".pest-temp",
+  analysisFile: ".pest-temp/.pest-analysis.json",
 };
 
 export async function updatePestConfiguration(cwd, config) {
@@ -59,4 +68,32 @@ export async function updatePestConfiguration(cwd, config) {
     file,
     `export default ${JSON.stringify(finalConfig, null, 2)};`
   );
+}
+
+export async function mockPestAnalysis(
+  cwd,
+  analysis,
+  file = ".pest-temp/.pest-analysis.json"
+) {
+  const fullAnalysis = {
+    runAllTests: false,
+    modifiedEndpoints: [],
+    modifiedTestFiles: [],
+    timestamp: new Date().toISOString(),
+    ...analysis,
+  };
+
+  const filePath = path.join(cwd, file);
+  await fs.mkdir(dirname(filePath), { recursive: true });
+  await fs.writeJSON(filePath, fullAnalysis);
+}
+
+export async function updateTestEndpoints(
+  cwd,
+  newEndpoints,
+  file = "tests/test-endpoints.json"
+) {
+  const baseContent = await readJSON(cwd, file).catch(() => ({}));
+  const updatedContent = { ...baseContent, ...newEndpoints };
+  await fs.writeJSON(path.join(cwd, file), updatedContent);
 }

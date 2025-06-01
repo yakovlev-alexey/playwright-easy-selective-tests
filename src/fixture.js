@@ -29,7 +29,7 @@ import {
 export function createSelectiveTestFixture(options = {}) {
   const {
     analysisFile = ".pest-analysis.json",
-    endpointMapFile = "test-endpoints.json",
+    testEndpointMapFile = "test-endpoints.json",
     tempDir = ".pest-temp",
     getEndpointFromUrl = () => null,
   } = options;
@@ -51,7 +51,9 @@ export function createSelectiveTestFixture(options = {}) {
   const fixture = async ({ page }, use, testInfo) => {
     if (!analysisData) {
       analysisData = await readJsonFile(join(process.cwd(), analysisFile));
-      endpointMap = await readJsonFile(join(process.cwd(), endpointMapFile));
+      endpointMap = await readJsonFile(
+        join(process.cwd(), testEndpointMapFile)
+      );
     }
 
     const testId = getTestId(testInfo);
@@ -131,7 +133,7 @@ export function createSelectiveTestFixture(options = {}) {
           ", "
         )}. `;
       }
-      message += `Update ${endpointMapFile} and run tests again.`;
+      message += `Update ${testEndpointMapFile} and run tests again.`;
 
       testInfo.status = "failed";
       testInfo.annotations.push({

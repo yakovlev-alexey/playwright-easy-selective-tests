@@ -12,6 +12,8 @@ import { resolve } from "path";
  * @property {string} testFilesRegex - Regex for test files
  * @property {string} [testEndpointMapFile='test-endpoints.json'] - Output file for test-case to endpoint sync
  * @property {string} [projectRoot] - Path (relative to VCS root) to the project/package root
+ * @property {string} [tempDir='.pest-temp'] - Temporary directory for pest files
+ * @property {string} [analysisFile='.pest-temp/.pest-analysis.json'] - Output file for analysis results
  */
 
 /**
@@ -25,6 +27,8 @@ const defaultConfig = {
   excludeDirectories: [],
   testEndpointMapFile: "test-endpoints.json",
   projectRoot: undefined,
+  tempDir: ".pest-temp",
+  analysisFile: ".pest-temp/.pest-analysis.json",
 };
 
 /**
