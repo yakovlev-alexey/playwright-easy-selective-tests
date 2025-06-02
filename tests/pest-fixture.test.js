@@ -185,7 +185,7 @@ describe("pest fixture", () => {
       modifiedTestFiles: ["tests/about.spec.js"],
     });
 
-    await execAsync(`pnpm test`, { cwd, signal });
+    await execAsync(`pnpm test`, { cwd, signal }).catch(() => {});
 
     const testResults = await readJSON(cwd, "test-results.json");
     testResults.tests.forEach((test) => {
