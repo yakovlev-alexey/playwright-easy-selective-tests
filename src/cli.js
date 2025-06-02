@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { program } from "commander";
-import { writeFile, mkdir } from "fs/promises";
+import { writeFile, mkdir, access } from "fs/promises";
 import { dirname, resolve } from "path";
 import { loadConfig } from "./config.js";
 import { analyzeChanges } from "./analyzer.js";
@@ -127,6 +127,15 @@ export default {
 `;
 
     const configPath = resolve(process.cwd(), "pest.config.js");
+    if (
+      await access(configPath).then(
+        () => true,
+        () => false
+      )
+    ) {
+      console.log("pest.config.js already exists, not overwriting");
+      process.exit(0);
+    }
 
     try {
       await writeFile(configPath, configTemplate);

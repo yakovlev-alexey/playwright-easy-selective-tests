@@ -171,6 +171,28 @@ describe("pest fixture", () => {
     });
   });
 
+  test("should run and fail all tests if test-endpoints.json does not exist", async ({
+    cwd,
+    signal,
+  }) => {
+    await updatePestConfiguration(cwd, {
+      testEndpointMapFile: "test-endpoints.json",
+    });
+
+    await mockPestAnalysis(cwd, {
+      runAllTests: false,
+      modifiedEndpoints: [],
+      modifiedTestFiles: ["tests/about.spec.js"],
+    });
+
+    await execAsync(`pnpm test`, { cwd, signal });
+
+    const testResults = await readJSON(cwd, "test-results.json");
+    testResults.tests.forEach((test) => {
+      expect(test.status).toBe("failed");
+    });
+  });
+
   test("should use specified temp directory for worker endpoint map", async ({
     cwd,
     signal,

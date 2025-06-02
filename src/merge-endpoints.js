@@ -10,7 +10,15 @@ import { join } from "path";
 export async function mergeEndpointMappings(tempDir, outputFile) {
   try {
     // Read all worker files
-    const files = await readdir(tempDir);
+    let files = [];
+    try {
+      files = await readdir(tempDir);
+    } catch (error) {
+      if (error.code !== "ENOENT") {
+        throw error;
+      }
+    }
+
     const workerFiles = files.filter(
       (f) => f.startsWith("worker-") && f.endsWith(".json")
     );
@@ -30,7 +38,7 @@ export async function mergeEndpointMappings(tempDir, outputFile) {
     }
 
     // Merge all worker mappings
-    const allMappings = { ...existingMappings };
+    const allMappings = existingMappings;
 
     for (const file of workerFiles) {
       const filePath = join(tempDir, file);

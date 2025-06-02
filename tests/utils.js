@@ -4,6 +4,9 @@ import path from "node:path";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 import { dirname } from "node:path";
+import { constants, cp, mkdir, rm, writeFile, appendFile } from "fs/promises";
+import { join } from "path";
+import { fileURLToPath } from "url";
 
 export const execAsync = promisify(exec);
 
@@ -111,4 +114,22 @@ export async function updateTestEndpoints(
   );
   const updatedContent = { ...baseContent, ...newEndpoints };
   await fs.writeJSON(path.join(cwd, file), updatedContent);
+}
+
+export async function createMockWorkerFile(baseDir, tempDir, workerId, data) {
+  const workerFilePath = join(baseDir, tempDir, `worker-${workerId}.json`);
+  await mkdir(dirname(workerFilePath), { recursive: true });
+  await fs.writeFile(workerFilePath, JSON.stringify(data, null, 2));
+  return workerFilePath;
+}
+
+export async function createMockTestEndpointsFile(
+  baseDir,
+  relativeFilePath,
+  data
+) {
+  const filePath = join(baseDir, relativeFilePath);
+  await mkdir(dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+  return filePath;
 }
