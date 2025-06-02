@@ -4,8 +4,13 @@
 export default {
   vcs: "git",
   baseBranch: "main",
-  forceAllTestsFiles: ["package.json", "pnpm-lock.yaml"],
-  excludeDirectories: ["node_modules", ".next", ".git"],
+  forceAllTestsFiles: ["playwright.config.mjs"],
+  exclude: [
+    "node_modules",
+    "\\.next",
+    "\\.git",
+    "tests/excluded-file\\.spec\\.ts",
+  ],
   endpointRegex: "^pages/.*\\.js$",
   testFilesRegex: "^tests/.*\\.spec\\.js$",
   testEndpointMapFile: "tests/test-endpoints.json",

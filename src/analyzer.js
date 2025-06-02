@@ -17,27 +17,29 @@ import {
  * Runs dependency-cruiser API once and returns all referenced files
  * @param {string} filePattern - Pattern of changed files (regex string)
  * @param {string} [includeOnly] - Regex pattern to include only specific files
- * @param {string[]} excludeDirs - Directories to exclude
+ * @param {string[]} exclude - Directories to exclude
  * @returns {Promise<string[]>} List of all referenced files
  */
-async function getAllAffectedFiles(filePattern, includeOnly, excludeDirs) {
+async function getAllAffectedFiles(filePattern, includeOnly, exclude) {
   if (!filePattern) return [];
 
   const cruiseOptions = {
+    exclude: [...(exclude || []), "node_modules", "dist", "build", ".git"],
     outputType: "text",
-    includeOnly: includeOnly || undefined,
     reaches: filePattern,
-    exclude: excludeDirs,
   };
+
+  if (includeOnly) {
+    cruiseOptions.includeOnly = includeOnly;
+  }
 
   const filesToCruise = ["."];
 
   try {
-    const result = await cruise(filesToCruise, cruiseOptions);
-    const textOutput = result.output;
+    const { output } = await cruise(filesToCruise, cruiseOptions);
     const files = new Set();
 
-    for (const line of textOutput.split("\n")) {
+    for (const line of output.split("\n")) {
       if (!line.trim()) continue;
       // Support both unicode and ascii arrows
       const [left, right] = line.split(/\s*(?:→|->)\s*/);
@@ -118,7 +120,7 @@ export async function analyzeChanges(config) {
   const allAffectedFiles = await getAllAffectedFiles(
     filePattern,
     config.includeOnly,
-    config.excludeDirectories
+    config.exclude
   );
 
   const { endpoints: modifiedEndpoints, tests: modifiedTestFiles } =

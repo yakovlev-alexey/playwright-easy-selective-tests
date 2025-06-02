@@ -20,7 +20,7 @@ describe("pest analyze", () => {
   test("should output to provided path", async ({ cwd, signal }) => {
     await updatePestConfiguration(cwd, {
       analysisFile: "pest-analysis.json",
-      excludeDirectories: ["node_modules", "pest.config.js"],
+      exclude: ["node_modules", "pest.config.js"],
     });
     await execAsync("pnpm pest analyze", { cwd, signal });
     const analysis = await readJSON(cwd, "pest-analysis.json");

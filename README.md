@@ -50,11 +50,12 @@ export default {
     ".github/workflows/*.yml",
     "src/shared/config.js",
   ],
-  excludeDirectories: ["node_modules", "dist", ".git"],
+  exclude: ["node_modules", "dist", ".git"],
   endpointRegex: "^pages/.*\\.tsx?$",
   testFilesRegex: "^tests/.*\\.spec\\.ts$",
   testEndpointMapFile: "tests/test-endpoints.json",
   projectRoot: undefined,
+  includeOnly: undefined,
 };
 ```
 

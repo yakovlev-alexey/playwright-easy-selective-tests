@@ -95,13 +95,8 @@ export default {
     '.github/workflows/*.yml'
   ],
   
-  // Directories to exclude from dependency analysis
-  excludeDirectories: [
-    'node_modules',
-    'dist',
-    'build',
-    '.git'
-  ],
+  // Directories and files to exclude from cruising, e.g., [.next, dist]
+  exclude: ['dist'],
   
   // Include only specific files in dependency analysis (optional)
   // Example: '^(src|tests)/.*\.(ts|tsx|js|jsx)$'

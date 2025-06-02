@@ -6,7 +6,7 @@ import { resolve } from "path";
  * @property {string} [vcs='git'] - Version control system command
  * @property {string} [baseBranch='main'] - Branch name to diff against
  * @property {string[]} [forceAllTestsFiles=[]] - Additional files that force all tests to run
- * @property {string[]} [excludeDirectories=[]] - Directories to exclude from cruising
+ * @property {string[]} [exclude=[]] - Regex patterns to exclude certain directories or files
  * @property {string} [includeOnly] - Regex pattern to include only specific files in dependency analysis
  * @property {string} endpointRegex - Regex for identifying endpoint modules in dependency cruiser output
  * @property {string} testFilesRegex - Regex for test files
@@ -24,7 +24,7 @@ const defaultConfig = {
   vcs: "git",
   baseBranch: "main",
   forceAllTestsFiles: [],
-  excludeDirectories: [],
+  exclude: [],
   testEndpointMapFile: "test-endpoints.json",
   projectRoot: undefined,
   tempDir: ".pest-temp",
