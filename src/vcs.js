@@ -61,7 +61,10 @@ export async function wereFilesModified(vcs, baseBranch, files) {
 
   return files.some((file) =>
     changedFiles.some(
-      (changedFile) => changedFile === file || changedFile.endsWith(`/${file}`)
+      (changedFile) =>
+        changedFile === file ||
+        changedFile.startsWith(file) ||
+        changedFile.endsWith(`/${file}`)
     )
   );
 }

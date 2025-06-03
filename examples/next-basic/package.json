@@ -17,7 +17,8 @@
   "dependencies": {
     "next": "14",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "workspace-dep": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "1.52.0",

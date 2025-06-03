@@ -10,7 +10,7 @@ export const test = base.extend({
 
       await tmpDir.cleanup();
     },
-    { auto: true },
+    { auto: false },
   ],
   dependency: "next-basic",
 });

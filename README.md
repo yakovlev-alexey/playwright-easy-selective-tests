@@ -168,6 +168,24 @@ This command will generate a temporary file with the list of changed endpoints. 
 
 You can provide a custom `projectRoot` function so that PEST works within monorepos. `projectRoot` should include the path from VCS repository root. Only the changes from this path will be taken into account and this path will be omitted from results.
 
+### Workspace Dependency Detection
+
+If you are using a monorepo or workspace setup (e.g., with pnpm, yarn, npm workspaces), you can configure PEST to detect changes in dependency packages and automatically run all tests if any dependency package is modified.
+
+Add the `workspacePatterns` option to your `pest.config.js`:
+
+```js
+export default {
+  // ... other config ...
+  projectRoot: "apps/web", // relative to workspace root
+  workspacePatterns: ["packages/*"], // glob patterns for workspace packages
+};
+```
+
+If both `workspacePatterns` and `projectRoot` are set, PEST will use `@pnpm/fs.find-packages` to find all workspace packages and their manifests. If any of these packages change, all tests will be run.
+
+> One large caveat is that on direct dependencies are supported at the moment. Contributions are welcome
+
 ### CI configuration
 
 To use PEST in CI simply run `pnpm pest analyze` before running tests.

@@ -5,6 +5,9 @@ import {
   getChangedFilesMatching,
   wereFilesModified,
 } from "./vcs.js";
+import { findPackages } from "@pnpm/fs.find-packages";
+import { resolve, sep } from "path";
+import { readFile } from "fs/promises";
 
 /**
  * @typedef {Object} AnalysisResult
@@ -84,6 +87,45 @@ function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
 }
 
 /**
+ * Checks if any workspace dependency packages have changed
+ * @param {import('./config.js').PestConfig} config
+ * @returns {Promise<boolean>} True if any dependency package changed
+ */
+async function checkWorkspaceDependenciesChanged(config) {
+  if (config.workspacePatterns && config.projectRoot) {
+    const cwd = process.cwd();
+    const workspaceRoot = cwd.endsWith(config.projectRoot)
+      ? cwd.slice(0, -config.projectRoot.length).replace(/\/$/, "")
+      : cwd;
+    const pkgs = await findPackages(workspaceRoot, {
+      ignore: ["**/node_modules/**", "**/bower_components/**"],
+      includeRoot: true,
+      patterns: config.workspacePatterns,
+    });
+
+    const projectPkgPath = resolve(cwd, "package.json");
+    const projectPkg = JSON.parse(await readFile(projectPkgPath, "utf8"));
+
+    const directDeps = new Set([
+      ...Object.keys(projectPkg.dependencies || {}),
+      ...Object.keys(projectPkg.devDependencies || {}),
+    ]);
+
+    const dependencyPackages = pkgs.filter((pkg) => {
+      const pkgName = pkg.manifest.name;
+      return directDeps.has(pkgName);
+    });
+
+    const pkgsToCheck = dependencyPackages
+      .map((pkg) => pkg.rootDir.replace(workspaceRoot + sep, ""))
+      .filter((pkg) => pkg !== "");
+
+    return wereFilesModified(config.vcs, config.baseBranch, pkgsToCheck);
+  }
+  return false;
+}
+
+/**
  * Performs full analysis to determine which tests should run
  * @param {import('./config.js').PestConfig} config - Configuration
  * @returns {Promise<AnalysisResult>} Analysis result
@@ -97,6 +139,16 @@ export async function analyzeChanges(config) {
   );
 
   if (forceAll) {
+    return {
+      runAllTests: true,
+      modifiedEndpoints: [],
+      modifiedTestFiles: [],
+    };
+  }
+
+  // Check if any workspace dependency packages have changed
+  const depsChanged = await checkWorkspaceDependenciesChanged(config);
+  if (depsChanged) {
     return {
       runAllTests: true,
       modifiedEndpoints: [],

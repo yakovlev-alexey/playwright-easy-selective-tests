@@ -37,13 +37,13 @@ export async function initGit(cwd) {
 export async function appendFile(cwd, file, content) {
   const filePath = path.join(cwd, file);
   await fs.appendFile(filePath, content);
-  await execAsync(`git add ${file}`, { cwd });
+  await execAsync(`git add ${file}`, { cwd }).catch(() => {});
 }
 
 export async function writeFile(cwd, file, content) {
   const filePath = path.join(cwd, file);
   await fs.writeFile(filePath, content);
-  await execAsync(`git add ${file}`, { cwd });
+  await execAsync(`git add ${file}`, { cwd }).catch(() => {});
 }
 
 export async function readJSON(cwd, ...paths) {

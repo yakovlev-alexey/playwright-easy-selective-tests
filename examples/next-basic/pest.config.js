@@ -19,6 +19,7 @@ export default {
   projectRoot: import.meta.url.includes("playwright-easy-selective-tests")
     ? "examples/next-basic"
     : undefined,
+  workspacePatterns: ["examples/*"],
   getEndpointFromUrl: (url) => {
     try {
       const u = new URL(url, "http://localhost:3000");
