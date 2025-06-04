@@ -70,7 +70,6 @@ function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
   const endpoints = [];
   const tests = allAffectedFiles.filter((file) => testRegex.test(file));
 
-  // Process files to find endpoints
   allAffectedFiles.forEach((file) => {
     if (config.getEndpointFromFile) {
       const endpoint = config.getEndpointFromFile(file);
@@ -82,7 +81,6 @@ function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
     }
   });
 
-  // Also check if changed files themselves are endpoints or tests
   changedFiles.forEach((file) => {
     if (config.getEndpointFromFile) {
       const endpoint = config.getEndpointFromFile(file);
@@ -147,7 +145,6 @@ async function checkWorkspaceDependenciesChanged(config) {
  * @returns {Promise<AnalysisResult>} Analysis result
  */
 export async function analyzeChanges(config) {
-  // Check if any force-all-tests files were modified
   const forceAll = await wereFilesModified(
     config.vcs,
     config.baseBranch,
@@ -162,7 +159,6 @@ export async function analyzeChanges(config) {
     };
   }
 
-  // Check if any workspace dependency packages have changed
   const depsChanged = await checkWorkspaceDependenciesChanged(config);
   if (depsChanged) {
     return {

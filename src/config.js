@@ -5,17 +5,22 @@ import { resolve } from "path";
  * @typedef {Object} PestConfig
  * @property {string} [vcs='git'] - Version control system command
  * @property {string} [baseBranch='main'] - Branch name to diff against
+ *
  * @property {string[]} [forceAllTestsFiles=[]] - Additional files that force all tests to run
  * @property {string[]} [exclude=[]] - Regex patterns to exclude certain directories or files
- * @property {string} [includeOnly] - Regex pattern to include only specific files in dependency cruiser output
- * @property {string} endpointRegex - Regex for identifying endpoint modules in dependency cruiser output
+ * @property {string?} [includeOnly] - Regex pattern to include only specific files in dependency cruiser output
+ *
  * @property {string} testFilesRegex - Regex for test files
+ * @property {string} endpointRegex - Regex for identifying endpoint modules in dependency cruiser output
+ * @property {(filePath: string) => string|null} [getEndpointFromFile] - Function to extract endpoint from file path
+ * @property {undefined|(url: string) => string|null} [getEndpointFromUrl] - Function to extract endpoint from URL
+ *
  * @property {string} [testEndpointMapFile='test-endpoints.json'] - Output file for test-case to endpoint sync
  * @property {string} [tempDir='.pest-temp'] - Temporary directory for pest files
  * @property {string} [analysisFile='.pest-temp/.pest-analysis.json'] - Output file for analysis results
+ *
  * @property {string} [projectRoot] - Path (relative to VCS root) to the project/package root
  * @property {string[]} [workspacePatterns] - Glob patterns for workspace package detection
- * @property {(filePath: string) => string|null} [getEndpointFromFile] - Function to extract endpoint from file path
  */
 
 /**
@@ -57,8 +62,10 @@ export async function loadConfig(configPath = "pest.config.js") {
     const { default: userConfig } = await import(fullPath);
 
     // Validate required fields
-    if (!userConfig.endpointRegex) {
-      throw new Error("endpointRegex is required in configuration");
+    if (!userConfig.endpointRegex && !userConfig.getEndpointFromFile) {
+      throw new Error(
+        "endpointRegex or getEndpointFromFile is required in configuration"
+      );
     }
     if (!userConfig.testFilesRegex) {
       throw new Error("testFilesRegex is required in configuration");

@@ -12,7 +12,7 @@ program
   .description(
     "Playwright Easy Selective Tests - analyze dependencies and prepare test data"
   )
-  .version("0.1.0");
+  .version("1.0.0");
 
 program
   .command("analyze")
@@ -26,7 +26,6 @@ program
       console.log("Analyzing changes...");
       const analysis = await analyzeChanges(config);
 
-      // Prepare output data
       const outputData = {
         runAllTests: analysis.runAllTests,
         modifiedEndpoints: analysis.modifiedEndpoints,
@@ -92,7 +91,6 @@ export default {
   forceAllTestsFiles: [
     'playwright.config.js',
     'playwright.config.ts',
-    '.github/workflows/*.yml'
   ],
   
   // Directories and files to exclude from cruising, e.g., [.next, dist]
@@ -105,6 +103,28 @@ export default {
   // Regex to identify endpoint modules in dependency output
   // REQUIRED - must be configured for your project
   endpointRegex: '^src/pages/.*\.tsx?$',
+
+  // You can use this instead of \`endpointRegex\` to map files to endpoints, e.g.
+  // getEndpointFromFile: (filePath) => {
+  //   if (filePath.includes('pages/about.tsx')) return 'about'; // or any other string
+  //   return null; // or undefined
+  // },
+  // If you don't need this, leave it undefined
+  getEndpointFromFile: undefined,
+
+  // Function to map URLs to endpoints when running tests
+  // REQUIRED - must be configured for your project
+  getEndpointFromUrl: (url) => {
+    try {
+      const u = new URL(url, "http://localhost:3000");
+      let path = u.pathname;
+      if (path === "/") return "pages/index.js";
+      if (path.endsWith("/")) path = path.slice(0, -1);
+      return \`pages\${path}.js\`;
+    } catch {
+      return null;
+    }
+  }
   
   // Regex for test files
   // REQUIRED - must be configured for your project

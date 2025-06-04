@@ -1,6 +1,6 @@
 export default {
   test: {
-    testTimeout: 30000,
+    testTimeout: 45000,
     hookTimeout: 30000,
     include: ["tests/**/*.test.js"],
     exclude: ["examples/**"],

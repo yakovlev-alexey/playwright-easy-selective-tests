@@ -1,6 +1,6 @@
 {
   "name": "playwright-easy-selective-tests",
-  "version": "0.2.1",
+  "version": "1.0.0",
   "description": "Selective test runner for Playwright based on dependency analysis",
   "type": "module",
   "exports": {
@@ -25,10 +25,9 @@
     "playwright",
     "test",
     "selective",
-    "dependency",
-    "analysis"
+    "dependency-analysis"
   ],
-  "author": "",
+  "author": "Alexey Yakovlev <alexeyyakovlev0359@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "@pnpm/fs.find-packages": "^1000.0.11",

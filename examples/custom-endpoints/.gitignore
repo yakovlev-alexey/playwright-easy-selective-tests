@@ -12,4 +12,4 @@ test-results.json
 .pest-analysis.json
 .pest-temp/
 
-.next
+dist
