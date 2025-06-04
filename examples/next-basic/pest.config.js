@@ -3,7 +3,7 @@
  */
 export default {
   vcs: "git",
-  baseBranch: "main",
+  baseBranch: "HEAD",
   forceAllTestsFiles: ["playwright.config.mjs"],
   exclude: [
     "node_modules",
