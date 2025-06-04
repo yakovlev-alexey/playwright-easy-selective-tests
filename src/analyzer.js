@@ -67,15 +67,31 @@ async function getAllAffectedFiles(filePattern, includeOnly, exclude) {
 function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
   const endpointRegex = new RegExp(config.endpointRegex);
   const testRegex = new RegExp(config.testFilesRegex);
-  const endpoints = allAffectedFiles.filter((file) => endpointRegex.test(file));
+  const endpoints = [];
   const tests = allAffectedFiles.filter((file) => testRegex.test(file));
+
+  // Process files to find endpoints
+  allAffectedFiles.forEach((file) => {
+    if (config.getEndpointFromFile) {
+      const endpoint = config.getEndpointFromFile(file);
+      if (endpoint && !endpoints.includes(endpoint)) {
+        endpoints.push(endpoint);
+      }
+    } else if (endpointRegex.test(file) && !endpoints.includes(file)) {
+      endpoints.push(file);
+    }
+  });
 
   // Also check if changed files themselves are endpoints or tests
   changedFiles.forEach((file) => {
-    if (endpointRegex.test(file) && !endpoints.includes(file)) {
+    if (config.getEndpointFromFile) {
+      const endpoint = config.getEndpointFromFile(file);
+      if (endpoint && !endpoints.includes(endpoint)) {
+        endpoints.push(endpoint);
+      }
+    } else if (endpointRegex.test(file) && !endpoints.includes(file)) {
       endpoints.push(file);
-    }
-    if (testRegex.test(file) && !tests.includes(file)) {
+    } else if (testRegex.test(file) && !tests.includes(file)) {
       tests.push(file);
     }
   });

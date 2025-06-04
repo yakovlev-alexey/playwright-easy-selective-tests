@@ -55,4 +55,27 @@ describe("pest workflow", () => {
     const testEndpoints = await readJSON(cwd, "test-endpoints.json");
     expect(Object.keys(testEndpoints).length).toBe(5);
   });
+
+  test.scoped({ dependency: "custom-endpoints" });
+  test("works with custom endpoints", async ({ cwd, signal }) => {
+    await appendFile(cwd, "app1/src/App.jsx", "\n// change");
+
+    await execAsync(`pnpm pest analyze`, { cwd, signal });
+    const analysis = await readJSON(cwd, ".pest-temp", ".pest-analysis.json");
+
+    expect(analysis.runAllTests).toBe(false);
+    expect(analysis.modifiedEndpoints).toMatchObject(["app1"]);
+    expect(analysis.modifiedTestFiles).toMatchObject([]);
+
+    await execAsync(`pnpm test`, { cwd, signal });
+    const testResults = await readJSON(cwd, "test-results.json");
+
+    testResults.tests.forEach((test) => {
+      if (test.file.includes("app1.spec.js")) {
+        expect(test.status).toBe("passed");
+      } else {
+        expect(test.status).toBe("skipped");
+      }
+    });
+  });
 });

@@ -1,0 +1,14 @@
+{
+  "app1.spec.js::app1 home page": [
+    "app1"
+  ],
+  "app1.spec.js::app1 about page": [
+    "app1"
+  ],
+  "app2.spec.js::app2 dashboard page": [
+    "app2"
+  ],
+  "app2.spec.js::app2 settings page": [
+    "app2"
+  ]
+}
