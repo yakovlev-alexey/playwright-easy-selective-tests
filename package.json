@@ -1,6 +1,6 @@
 {
   "name": "playwright-easy-selective-tests",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Selective test runner for Playwright based on dependency analysis",
   "type": "module",
   "exports": {

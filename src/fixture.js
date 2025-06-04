@@ -24,7 +24,7 @@ import {
 /**
  * Creates a Playwright fixture for selective test execution
  * @param {FixtureOptions} options - Fixture options
- * @returns {Function} Playwright fixture function
+ * @returns {[Function, Function]} Playwright fixture function and afterAll hook
  */
 export function createSelectiveTestFixture(options = {}) {
   const {
