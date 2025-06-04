@@ -124,7 +124,7 @@ export default {
     } catch {
       return null;
     }
-  }
+  },
   
   // Regex for test files
   // REQUIRED - must be configured for your project

@@ -52,13 +52,10 @@ This creates a `pest.config.js` file. Edit it to match your project:
 export default {
   vcs: "git",
   baseBranch: "main",
-  forceAllTestsFiles: [
-    "playwright.config.js",
-    "src/shared/config.js",
-  ],
+  forceAllTestsFiles: ["playwright.config.js", "src/shared/config.js"],
   exclude: ["node_modules", "dist", ".git"],
   endpointRegex: "^pages/.*\\.tsx?$",
-  getEndpointFromFile: undefined;
+  getEndpointFromFile: undefined,
   testFilesRegex: "^tests/.*\\.spec\\.ts$",
   testEndpointMapFile: "tests/test-endpoints.json",
   projectRoot: undefined,
