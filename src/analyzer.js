@@ -67,36 +67,38 @@ async function getAllAffectedFiles(filePattern, includeOnly, exclude) {
 function filterAffectedFiles(allAffectedFiles, changedFiles, config) {
   const endpointRegex = new RegExp(config.endpointRegex);
   const testRegex = new RegExp(config.testFilesRegex);
-  const endpoints = [];
-  const tests = allAffectedFiles.filter((file) => testRegex.test(file));
+  const endpoints = new Set();
+  const tests = new Set();
 
   allAffectedFiles.forEach((file) => {
-    if (config.getEndpointFromFile) {
+    if (testRegex.test(file)) {
+      tests.add(file);
+    } else if (config.getEndpointFromFile) {
       const endpoint = config.getEndpointFromFile(file);
-      if (endpoint && !endpoints.includes(endpoint)) {
-        endpoints.push(endpoint);
+      if (endpoint) {
+        endpoints.add(endpoint);
       }
-    } else if (endpointRegex.test(file) && !endpoints.includes(file)) {
-      endpoints.push(file);
+    } else if (endpointRegex.test(file)) {
+      endpoints.add(file);
     }
   });
 
   changedFiles.forEach((file) => {
-    if (config.getEndpointFromFile) {
+    if (testRegex.test(file)) {
+      tests.add(file);
+    } else if (config.getEndpointFromFile) {
       const endpoint = config.getEndpointFromFile(file);
-      if (endpoint && !endpoints.includes(endpoint)) {
-        endpoints.push(endpoint);
+      if (endpoint) {
+        endpoints.add(endpoint);
       }
-    } else if (endpointRegex.test(file) && !endpoints.includes(file)) {
-      endpoints.push(file);
-    } else if (testRegex.test(file) && !tests.includes(file)) {
-      tests.push(file);
+    } else if (endpointRegex.test(file)) {
+      endpoints.add(file);
     }
   });
 
   return {
-    endpoints: [...new Set(endpoints)],
-    tests: [...new Set(tests)],
+    endpoints: [...endpoints],
+    tests: [...tests],
   };
 }
 
