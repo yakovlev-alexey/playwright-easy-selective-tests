@@ -25,7 +25,7 @@ export async function readJsonFile(filePath) {
  */
 export function getTestId(testInfo) {
   const fileName = basename(testInfo.file);
-  const testPath = testInfo.titlePath.slice(1).join(" ");
+  const testPath = testInfo.titlePath.slice(1).join("::");
   return `${fileName}::${testPath}`;
 }
 
